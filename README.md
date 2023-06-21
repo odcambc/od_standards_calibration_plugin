@@ -11,5 +11,4 @@ Type into your command line:
 pio run od_calibration_from_standards
 ```
 
-To perform this calibration, insert your vial containing media into the Pioreactor and submerge your light probe. Follow the prompts on the command line. The plugin will increase the light intensity, and prompt you to record the readings from your light probe. A calibration line of best fit will be generated based on your light probe readings.
-
+To perform this calibration, prepare a set of standards in individual vials with known OD (at least 10 mL volume) and with stir bars. Run the above command and follow the prompts. A calibration based on fitting will be produced.
