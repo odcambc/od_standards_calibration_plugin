@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name="od_standards_calibration_plugin",
-    version="1.0.1",
+    version="1.0.2",
     license="MIT",
     description="Calibrate OD using a set of standards.",
     long_description=open("README.md").read(),
