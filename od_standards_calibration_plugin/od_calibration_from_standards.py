@@ -333,7 +333,7 @@ def save_results(
         curve_data_=curve_data_,
         curve_type=curve_type,
         voltages=voltages,
-        inferred_od600s=od600_values,
+        od600s=od600_values,
         ir_led_intensity=float(config["od_config"]["ir_led_intensity"]),
         pd_channel=signal_channel,
     )
@@ -451,7 +451,7 @@ def display(name: str | None) -> None:
 
     def display_from_calibration_blob(data_blob) -> None:
         voltages = data_blob["voltages"]
-        ods = data_blob["inferred_od600s"]
+        ods = data_blob["od600s"]
         name, angle = data_blob["name"], data_blob["angle"]
         click.echo()
         click.echo(click.style(f"Calibration `{name}`", underline=True, bold=True))
