@@ -15,7 +15,6 @@ from msgspec.json import encode
 
 from pioreactor import structs
 from pioreactor import types as pt
-from pioreactor.background_jobs.od_reading import start_od_reading
 from pioreactor.background_jobs.stirring import start_stirring as stirring
 from pioreactor.background_jobs.stirring import Stirrer
 from pioreactor.config import config
@@ -24,9 +23,9 @@ from pioreactor.mureq import patch
 from pioreactor.mureq import put
 from pioreactor.utils import is_pio_job_running
 from pioreactor.utils import local_persistant_storage
-from pioreactor.utils import publish_ready_to_disconnected_state
+from pioreactor.utils import managed_lifecycle
 from pioreactor.utils.timing import current_utc_datetime
-from pioreactor.whoami import get_latest_testing_experiment_name
+from pioreactor.whoami import get_testing_experiment_name
 from pioreactor.whoami import get_unit_name
 from pioreactor.whoami import is_testing_env
 
@@ -115,7 +114,7 @@ def start_stirring(target_rpm: int) -> Stirrer:
     st = stirring(
         target_rpm=target_rpm,
         unit=get_unit_name(),
-        experiment=get_latest_testing_experiment_name(),
+        experiment=get_testing_experiment_name(),
     )
     st.block_until_rpm_is_close_to_target(abs_tolerance=120)
     return st
@@ -152,6 +151,8 @@ def plot_data(
 
 
 def start_recording_standards(st: Stirrer, signal_channel):
+    
+    from pioreactor.background_jobs.od_reading import start_od_reading
     voltages = []
     od600_values = []
     click.echo("Starting OD recordings.")
@@ -162,7 +163,7 @@ def start_recording_standards(st: Stirrer, signal_channel):
         interval=None,
         unit=get_unit_name(),
         fake_data=is_testing_env(),
-        experiment=get_latest_testing_experiment_name(),
+        experiment=get_testing_experiment_name(),
         use_calibration=False,
     ) as od_reader:
 
@@ -349,12 +350,12 @@ def save_results(
 
 def od_calibration_from_standards() -> None:
     unit = get_unit_name()
-    experiment = get_latest_testing_experiment_name()
+    experiment = get_testing_experiment_name()
 
     if any(is_pio_job_running(["stirring", "od_reading"])):
         raise ValueError("Stirring and OD reading should be turned off.")
 
-    with publish_ready_to_disconnected_state(
+    with managed_lifecycle(
         unit, experiment, "od_calibration_from_standards"
     ):
         introduction()
